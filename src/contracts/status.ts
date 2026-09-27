@@ -3,8 +3,10 @@ import { z } from "zod";
 /**
  * Frozen contract for `GET /api/status` (PRD-0001, ADR-0006).
  *
- * Frozen at Stage 2, 2026-09-27. This file is the single source for runtime validation and the
- * TypeScript types consumed by both the server routes and the page script. Changing a field after
+ * Frozen at Stage 2, 2026-09-27; amended same day during PRD-0001 implementation (no deployed
+ * consumer): `url` constrained to HTTPS GitHub PR URLs so a hostile link cannot reach the page's
+ * href sink. This file is the single source for runtime validation and the TypeScript types
+ * consumed by both the server routes and the page script. Changing a field after
  * consumers implement against it requires the amendment matrix in docs/contracts/README.md.
  *
  * Invariant not expressible in the schema itself, enforced by the verdict engine and tested:
@@ -41,13 +43,18 @@ export type PrReasonCode = z.infer<typeof prReasonCodeSchema>;
 export const prVerdictSchema = z.enum(["ship", "fix", "wait"]);
 export type PrVerdict = z.infer<typeof prVerdictSchema>;
 
-const isoDatetime = z.string().datetime({ offset: true });
+const isoDatetime = z.iso.datetime({ offset: true });
+
+/** PR links are rendered as hrefs, so the scheme is constrained, not just syntax (NFR2). */
+const prUrl = z
+  .url()
+  .refine((u) => /^https:\/\/github\.com\//.test(u), "must be an HTTPS GitHub URL");
 
 export const prEntrySchema = z.object({
   number: z.number().int().positive(),
   title: z.string(),
   author: z.string(),
-  url: z.string().url(),
+  url: prUrl,
   headRefName: z.string(),
   baseRefName: z.string(),
   isDraft: z.boolean(),
@@ -75,11 +82,11 @@ export type BranchEntry = z.infer<typeof branchEntrySchema>;
  * the failure (auth, rate limit, network, malformed payload) — never GitHub-derived content and
  * never containing the token.
  */
-const prsSectionSchema = z.discriminatedUnion("ok", [
+const prsSectionSchema = z.union([
   z.object({ ok: z.literal(true), data: z.array(prEntrySchema) }),
   z.object({ ok: z.literal(false), error: z.string() }),
 ]);
-const branchesSectionSchema = z.discriminatedUnion("ok", [
+const branchesSectionSchema = z.union([
   z.object({ ok: z.literal(true), data: z.array(branchEntrySchema) }),
   z.object({ ok: z.literal(false), error: z.string() }),
 ]);
@@ -87,7 +94,7 @@ const branchesSectionSchema = z.discriminatedUnion("ok", [
 export const shipSignalSchema = z.enum(["ship", "fix", "wait", "unknown"]);
 export type ShipSignal = z.infer<typeof shipSignalSchema>;
 
-export const statusResponseSchema = z.discriminatedUnion("ok", [
+export const statusResponseSchema = z.union([
   z.object({
     ok: z.literal(true),
     /** `owner/name` of the configured repo; the page titles itself from this. */
