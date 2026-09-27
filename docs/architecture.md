@@ -14,7 +14,7 @@ JSON endpoints. No other systems, no database, no queues (ADR-0005).
 
 | Container | Responsibility | Tech | Talks to |
 | --------- | -------------- | ---- | -------- |
-| Shipcheck server | Serves the page, reads GitHub, computes verdicts, caches 60s | Hono + TypeScript on Node 20 | GitHub REST API, browser |
+| Shipcheck server | Serves the page, reads GitHub, computes verdicts, caches 60s | Hono + TypeScript on Node 22+ | GitHub REST API, browser |
 | Shipcheck page | Renders PR verdicts, branch-hygiene panel, ship signal | Static HTML + vanilla JS (or a Preact island) | Shipcheck server (`/api/`) |
 
 ## Key components
@@ -45,15 +45,15 @@ schemas in `src/contracts/`. Source of truth is GitHub.
 
 ## Planned changes
 
-- **PRD-0001 (approved, not implemented):** the v1 core — composite `/api/status` snapshot, one-page
+- **PRD-0001 (approved):** the v1 core — composite `/api/status` snapshot, one-page
   UI with 60s auto-poll, verdict engine, branch-hygiene panel, ship signal, in-memory cache.
-  Contract frozen at `src/contracts/status.ts`. No code exists yet; the sections above describe the
-  approved shape this feature builds.
+  Contract frozen at `src/contracts/status.ts`; the sections above describe the shape this feature
+  builds. Live delivery state lives in the tracker.
 
 ## Cross-cutting concerns
 
 - **Auth:** outbound only — env-provided read-only fine-grained GitHub token; no viewer auth in v1
-  (ADR-0004).
+  (ADR-0004). The server binds 127.0.0.1 so repo data is reachable only from the operator's machine.
 - **Errors:** GitHub API failures degrade per-section on the page (verdicts, hygiene, signal show
   what succeeded) with a clear error state; token errors surface as config problems, never echoing
   the token.
@@ -64,7 +64,7 @@ schemas in `src/contracts/`. Source of truth is GitHub.
 ## Decisions affecting this architecture
 
 - [ADR-0001](./adr/0001-record-architecture-decisions.md) — record architecture decisions
-- [ADR-0002](./adr/0002-stack.md) — TypeScript + Hono on Node 20
+- [ADR-0002](./adr/0002-stack.md) — TypeScript + Hono on Node 22+
 - [ADR-0003](./adr/0003-repo-layout.md) — single-package layout
 - [ADR-0004](./adr/0004-auth-and-token-model.md) — read-only fine-grained token, no viewer auth
 - [ADR-0005](./adr/0005-datastore.md) — GitHub API as the only store, 60s in-memory cache

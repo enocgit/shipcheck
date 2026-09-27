@@ -14,9 +14,10 @@ read to whoever can reach the server. The instance is an operator tool, not a mu
 ## Decision
 
 We will authenticate to GitHub with a fine-grained PAT scoped to exactly one repository and
-read-only permissions (`metadata`, `pull_requests`, `contents` — read only), supplied via the
-`GITHUB_TOKEN` environment variable. The application performs no write operations, and no code
-path accepts or forwards a write-capable action. Viewer authentication is out of scope for v1;
+read-only permissions (`metadata`, `pull_requests`, `contents`, `checks` — all read only), supplied
+via the `GITHUB_TOKEN` environment variable. The `checks` read is required by the check-runs
+endpoint that feeds the verdict engine; the token performs no write operations, and no code path
+accepts or forwards a write-capable action. Viewer authentication is out of scope for v1;
 deploying the instance anywhere a non-operator can reach it is a configuration error documented in
 `docs/security.md`.
 
