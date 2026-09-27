@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shipcheck</title>
+  <style>
+    :root {
+      --bg: #f2f5f4;
+      --ink: #123049;
+      --ship: #1a7a4c;
+      --fix: #c2431f;
+      --wait: #b07c1f;
+      --unknown: #5b6b70;
+      --line: #c9d4d2;
+      --card: #fbfcfc;
+      --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+      --serif: Iowan Old Style, Palatino, Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0 auto;
+      max-width: 46rem;
+      padding: 1.5rem 1rem 4rem;
+      background: var(--bg);
+      color: var(--ink);
+      font: 16px/1.5 system-ui, sans-serif;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--ink);
+    }
+    /* Signature: a three-flag hoist encoding the ship signal. */
+    .hoist { display: flex; gap: 4px; }
+    .flag {
+      width: 22px;
+      height: 30px;
+      border: 1px solid var(--ink);
+      display: grid;
+    }
+    .flag.green  { background: var(--ship); }
+    .flag.red    { background: var(--fix); }
+    .flag.amber  { background: var(--wait); }
+    .flag.grey   { background: var(--unknown); }
+    .flag.split  { background: linear-gradient(180deg, currentColor 50%, #fbfcfc 50%); }
+    .flag.stripe {
+      background: repeating-linear-gradient(45deg, currentColor 0 5px, #fbfcfc 5px 10px);
+    }
+    h1 { font: italic 1.35rem/1.2 var(--serif); margin: 0; }
+    .repo { font: 0.85rem var(--mono); color: var(--unknown); }
+    .signal-word {
+      margin-left: auto;
+      font: 700 1rem var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .signal-word.ship { color: var(--ship); }
+    .signal-word.fix { color: var(--fix); }
+    .signal-word.wait { color: var(--wait); }
+    .signal-word.unknown { color: var(--unknown); }
+    .meta { font: 0.75rem var(--mono); color: var(--unknown); margin: 0.75rem 0 1.5rem; }
+    h2 {
+      font: 600 0.8rem var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin: 2rem 0 0.75rem;
+    }
+    .banner {
+      border: 1px solid var(--fix);
+      border-left: 4px solid var(--fix);
+      background: var(--card);
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+    }
+    .banner .why { font: 0.8rem var(--mono); color: var(--unknown); }
+    article {
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--unknown);
+      background: var(--card);
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+    article.ship { border-left-color: var(--ship); }
+    article.fix { border-left-color: var(--fix); }
+    article.wait { border-left-color: var(--wait); }
+    .card-head { display: flex; align-items: baseline; gap: 0.75rem; }
+    .verdict {
+      font: 700 0.8rem var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    article.ship .verdict { color: var(--ship); }
+    article.fix .verdict { color: var(--fix); }
+    article.wait .verdict { color: var(--wait); }
+    .pr-title { font: 1rem var(--serif); }
+    .pr-title a { color: inherit; text-underline-offset: 3px; }
+    .reasons { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; padding: 0; list-style: none; }
+    .reasons li {
+      font: 0.72rem var(--mono);
+      border: 1px solid var(--line);
+      padding: 0.1rem 0.5rem;
+      color: var(--ink);
+    }
+    table { width: 100%; border-collapse: collapse; font: 0.85rem var(--mono); }
+    th {
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 1px solid var(--ink);
+      padding: 0.3rem 0.5rem 0.3rem 0;
+    }
+    td { border-bottom: 1px solid var(--line); padding: 0.35rem 0.5rem 0.35rem 0; }
+    td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .stale-yes { color: var(--fix); font-weight: 700; }
+    .stale-no { color: var(--ship); }
+    .section-error { font: 0.85rem var(--mono); color: var(--fix); }
+    :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hoist" id="hoist" aria-hidden="true"></div>
+    <div>
+      <h1>Can I ship today?</h1>
+      <div class="repo" id="repo">loading…</div>
+    </div>
+    <span class="signal-word" id="signal"></span>
+  </header>
+  <p class="meta" id="meta"></p>
+  <div id="banner"></div>
+  <main>
+    <section id="prs-section" aria-labelledby="prs-heading">
+      <h2 id="prs-heading">Pull requests</h2>
+      <div id="prs"></div>
+    </section>
+    <section aria-labelledby="branches-heading">
+      <h2 id="branches-heading">Branch hygiene</h2>
+      <div id="branches"></div>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
