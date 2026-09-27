@@ -41,6 +41,14 @@ ci rules).
    that approval — execute the merge after the commit and verify the result. Merge ownership is
    never delegated.
 
+Once the push/PR is done, announce the gate in one line and stop:
+
+> `SDLC ▸ Stage 7/8 Land · next gate: merging — merge when ready; I verify once you confirm.`
+
+No merge-preparation essay, no second approval request — the merge decision was already asked at
+the CI seam. Resume when the human confirms the merge (local-only: resume immediately after the
+combined ask is honored).
+
 ## After the merge (Land's tail)
 
 Complete the task transition per `references/rules.md` → Task completion by tracker, then proceed

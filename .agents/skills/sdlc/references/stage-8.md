@@ -35,10 +35,15 @@ whole section under ~30 bullets — at the cap, earn each new line by removing o
 
 If a learning, local-only tracker transition, or blocking correction changes a repository file:
 check out and sync the default branch, then ask to land the edit there. Landing ask, by remote
-state: **no remote** → commit to the local default branch; **remote, default branch unprotected**
-→ commit and push under the same approval; **remote, default branch protected** →
-`plan/{NNNN}-{slug}` → PR → merge, then confirm. Stage 8's learnings land before the next task or
-feature branch.
+state: **no remote** → "Approve the retro package — commit to {default branch}?"; **remote,
+default branch unprotected** → "Approve the retro package — commit and push to {default
+branch}?" under the same approval; **remote, default branch protected** → `plan/{NNNN}-{slug}` →
+PR → merge, then confirm. Stage 8's learnings land before the next task or feature branch.
+
+The epilogue lands **directly on the default branch by design, not as a feature PR**: its content
+is post-merge fact (delivery record citing the merge, issue closures, shipped-behavior
+reconciliation) — a PR cannot carry its own merge's record. The protected-branch PR path is the
+only exception, forced by the remote, not chosen for ceremony.
 
 ## Epic closure (once, on the final child only)
 

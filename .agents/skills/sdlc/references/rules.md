@@ -82,6 +82,9 @@ _then_ stop, at the push, with one combined question:
   the approval covers the commit and the Stage 7 merge, so local-only work stops once, not
   twice. The human still owns the merge decision; record it in the tracker close-out.
 
+The ask is the sentence above plus at most a one-line summary of what ships — commit lists,
+PR descriptions, and CI status belong in the disclosure after the fact, not the ask.
+
 After approval: create the commit first, verify its parent and tree, and rerun every metadata- or
 topology-dependent check against that commit; if any fails, stop before the push. When they pass,
 push or open the PR and start CI when available, then follow the Land rules. No CI workflow → CI is

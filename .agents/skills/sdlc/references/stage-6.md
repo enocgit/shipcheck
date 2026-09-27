@@ -38,6 +38,11 @@ inaccessible or coverage is unknown, report incomplete coverage and **block** ra
 clean verdict. Record coverage and limits in a dated record under `docs/security/records/` and
 index it in `docs/security.md`. The canonical sensitive-area list is `AGENTS.md` → Sensitive areas.
 
+**Re-review after substantive fixes.** Fixes from a review round that change behavior require
+another fresh-context review scoped to the fixes (and whatever they touch) — the fix author's own
+test pass does not retire findings. Stop when a round returns only advisory findings; do not loop
+for stylistic residue.
+
 ## The CI seam (end of this stage)
 
 After review passes, make **one combined ask** — the don't-commit-unless-asked guardrail stops

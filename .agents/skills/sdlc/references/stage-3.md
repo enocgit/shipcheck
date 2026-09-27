@@ -10,7 +10,8 @@ Tracker tasks for the feature — one epic/parent per feature, one task per chil
 
 - **GitHub (default):** create issues with `gh issue create`, shaped per
   `.github/ISSUE_TEMPLATE/{epic,task}.md`. `--body` bypasses the template, so follow its structure
-  by hand: reference line → Scope/Tasks → DoD.
+  by hand: reference line → Scope/Tasks → DoD. Link children to the epic with the tracker's native
+  hierarchy (GitHub sub-issues), so merging auto-closes the set.
 - **Another external tracker:** its native create call and issue types.
 - **Local-only:** add one feature/epic row and its child task rows to `docs/progress.md`; put the
   feature key in each task's `Parent` column. Number the task rows in their `#` column — that

@@ -15,6 +15,12 @@ Read this before any Stage 4 work. The verification rules this stage acts on are
    the plan **deviates from the approved decomposition** — in those cases stop for approval.
    Otherwise state the plan and proceed; the human can interrupt at any time.
 4. One feature in flight per branch; one task at a time. Reference the tracker issue (its `#`/key)
+
+**Landing cadence is a plan property — set it here and disclose it.** Thin slices of one
+shippable change can share a branch and land as one reviewed merge (several small commits, one
+per referenced task); independently shippable tasks land task-by-task through their own
+Stage 6–7 cycle. Cheap local merges favor per-task cadence; remote PR ceremony favors per-branch.
+Whichever cadence the plan sets, the CI-seam ask names every task its merge closes.
    in commits/PRs when the task has one.
 
 ## Skills
