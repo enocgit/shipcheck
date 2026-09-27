@@ -11,9 +11,9 @@
 
 ## Where the contract artifacts live
 
-- **HTTP API:** Zod schemas in `src/contracts/*.ts` — the single source for runtime validation and
-  the TypeScript types consumed by both the `/api/` routes and the page script
-  (future — not built yet; established by the first feature's Stage 2 contract freeze).
+- **HTTP API:** Zod schemas in `src/contracts/status.ts` — the single source for runtime validation and
+  the TypeScript types consumed by both the `/api/` routes and the page script. `status.ts` defines
+  the frozen `GET /api/status` snapshot (PRD-0001, frozen 2026-09-27).
 - **Database:** none — the GitHub REST API is the only store (ADR-0005); no schema artifacts exist
   or will exist.
 - **Boundary documents:** none currently; add here only when an interface needs prose beyond the

@@ -43,6 +43,13 @@ schemas in `src/contracts/`. Source of truth is GitHub.
    Reasons list alongside every verdict; the overall ship signal derives from all verdicts plus
    branch hygiene.
 
+## Planned changes
+
+- **PRD-0001 (approved, not implemented):** the v1 core — composite `/api/status` snapshot, one-page
+  UI with 60s auto-poll, verdict engine, branch-hygiene panel, ship signal, in-memory cache.
+  Contract frozen at `src/contracts/status.ts`. No code exists yet; the sections above describe the
+  approved shape this feature builds.
+
 ## Cross-cutting concerns
 
 - **Auth:** outbound only — env-provided read-only fine-grained GitHub token; no viewer auth in v1

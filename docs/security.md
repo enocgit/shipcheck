@@ -59,6 +59,18 @@ sensitive data, trust boundaries, hostile-input behavior, and behavior when GitH
 information. Planned and enforced controls are recorded without marking implementation progress;
 approval or schema tests alone do not establish runtime enforcement.
 
+### Feature 0001 — verdict page (PRD 0001, ADR-0006)
+
+No new actors or trust boundaries beyond the foundation set; this feature is the first inhabitant
+of the browser ↔ server and server ↔ GitHub boundaries.
+
+| Asset / data | Threat | Mitigation | Owner |
+| ------------ | ------ | ---------- | ----- |
+| Rendered page | XSS via attacker-controlled GitHub strings (PR titles, branch names, author logins) | Planned: Zod validation at `/api/` (`src/contracts/status.ts`), then HTML-escape every string before render; no raw HTML injection in the page script. Enforced at Stage 6 with evidence | Feature implementation |
+| `/api/status` responses | Malformed or hostile GitHub payloads rendered as trusted | Planned: every GitHub response validated against the contract before caching; schema violations become the typed degraded state, never page content | Feature implementation |
+| Error output | Token or GitHub URL (which embeds the token) leaked through error strings shown on the page or logged | Planned: error messages in the contract are server-authored strings only; GitHub client scrubs credential material from any surfaced error | Feature implementation |
+| Section failures | Verdicts derived from partial data mislead the operator | Planned: per-section `ok` in the contract; `shipSignal: "unknown"` whenever any section failed — no verdict from incomplete data (contract invariant) | Feature implementation |
+
 ## Baseline controls (check on every sensitive change)
 
 - [ ] **AuthN/AuthZ** — every endpoint checks identity _and_ permission; no broken object-level
@@ -84,6 +96,7 @@ Close its findings before merge, and record decisions that change the security p
 | Date | Feature | Review | Findings | Residual risk | Record |
 | ---- | ------- | ------ | -------- | ------------- | ------ |
 | 2026-09-27 | Foundation (Stage 0b planning package) | planning | 1 × MEDIUM, accepted | No viewer auth in v1 is safe only under the localhost/private deployment constraint | `records/2026-09-27-foundation-planning.md` |
+| 2026-09-27 | PRD-0001 verdict page (Stage 1–2 planning package) | planning | None | Planned controls (escaping, error scrubbing, signal invariant) unverified until implementation | `records/2026-09-27-prd-0001-planning.md` |
 
 Each record binds the target and base identities to a stable reviewed-subject identity. When
 `docs/security.md` is in scope, exclude or normalize only review-record metadata when computing that
