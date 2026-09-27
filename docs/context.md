@@ -2,72 +2,65 @@
 
 > Follow the documentation writing standard in AGENTS.md. This file is loaded every session, so keep
 > only durable domain facts and agent-critical gotchas. Link detail elsewhere.
->
-> STATUS: TEMPLATE — replace this marker and every `{placeholder}` while completing the project context.
-> Keep only durable facts that future contributors and agents need. This file loads every session, so
-> prune stale entries rather than append.
 
 ## Product
 
-<!-- What we're building, for whom, what success looks like. 1–2 paragraphs. -->
+Shipcheck answers one question per repository: **can I ship today?** A small server reads a
+repository's open pull requests, latest CI runs, and branch freshness through the GitHub REST API,
+using a read-only fine-grained token, and renders one page. Each PR gets a verdict —
+**ship** (mergeable, checks green, approved, fresh), **fix** (failing checks or review changes
+requested), or **wait** (missing review, behind base, or stale) — plus a branch-hygiene panel and an
+overall ship signal.
+
+The GitHub API is the only store. Responses are cached in memory for 60 seconds. No database, no
+background jobs, no persistence.
 
 ## Lifecycle
 
-> STATUS: TEMPLATE — set the real values at Stage 0 and keep them current. Rules across the kit
-> route on this block; a stale value silently misroutes them.
-
-- **Stage:** {prototype | pre-production | internal | live}
-- **Deployed consumers:** {none | internal only | external, and who}
-- **Real data:** {none | seed only | real rows in {tables}, read or written by {process}}
-- **Production traffic:** {none | staging only | live}
+- **Stage:** prototype
+- **Deployed consumers:** none
+- **Real data:** none — the instance reads one repo configured via env, using the operator's token
+- **Production traffic:** none
 
 ## Production register
 
-> Work we will owe, each with the trigger that forces it. Out of scope is a choice; this is debt
-> with an owner and a tripwire. The promotion event that trips a trigger is a gate, so land the item
-> before it. The conductor's `Before Land, re-evaluate lifecycle triggers` rule owns the downgrade,
-> retirement, and trigger requirements; this table is the register it reads.
-
 | Deferred | Trigger that forces it | Owner |
 | --- | --- | --- |
-| {e.g. API versioning and deprecation} | First deployed consumer | {owner} |
-| {e.g. expand/contract migration} | First real row or first deployed process reading from or writing to the table | {owner} |
-| {e.g. load/performance tests} | First staging or production traffic | {owner} |
-| {e.g. deployed-compatibility tests} | First deployed consumer | {owner} |
-| {e.g. multi-version tests} | First overlapping-version rollout | {owner} |
+| Viewer authentication | Any deployment a non-operator can reach | enoch |
+| Multi-repo support | A second repo is requested for the same instance | enoch |
+| Rate-limit backpressure (beyond the 60s cache) | Sustained polling against one token's GitHub rate limit | enoch |
+| Webhook-driven freshness | 60s cache staleness causes missed ship signals that matter | enoch |
 
 ## Personas
 
-- **{persona}**: goals, constraints, what they care about.
+- **Solo maintainer**: reviews their own repo's open PRs before merging; wants one glanceable page that says which PR is safe to merge right now and why.
 
 ## Glossary
 
-<!-- Domain terms an agent would otherwise guess wrong. -->
-
 | Term | Meaning |
-|------|---------|
-| {term} | {definition} |
+| ------ | --------- |
+| Verdict | Per-PR decision: `ship`, `fix`, or `wait`, always with reasons |
+| Ship signal | Overall one-word answer for the repo, derived from all PR verdicts and branch hygiene |
+| Fresh | PR head is not behind `base` and was updated recently enough to be current |
+| Stale | PR head is behind `base` or untouched long enough to warrant a rebase/review |
+| Branch hygiene | Panel covering stale branches and branches that are ahead/behind `main` |
+| Fine-grained token | GitHub PAT scoped read-only to one repository (contents, PRs, checks, metadata) |
 
 ## Hard constraints
 
-<!-- Non-negotiables: regulatory, regional, technical, business. -->
-
-- {constraint and why it exists}
+- Read-only: the token and the app must never perform write operations against GitHub.
+- One repo per instance, set from env config; no multi-repo features in v1.
+- No persistence: GitHub API + in-memory 60s cache only; no database, no background jobs.
+- No viewer authentication in v1; the instance must not be exposed beyond the operator.
 
 ## Out of scope (for now)
 
-- {thing we are deliberately not doing}
+- Webhooks (v1)
+- Multi-repo
+- Viewer authentication
+- Any write operations
+- Persistence of any kind
 
 ## Learnings
 
-<!-- Durable gotchas ONLY: things a future contributor or agent would get wrong without this line.
-     Keep a flat list of dated bullets, each <=3 lines; no per-feature headings.
-
-     Does NOT go here: what shipped (git/PR has it), why we chose X (ADR), system shape
-     (architecture.md), what's next (the tracker), test approach (test-strategy.md), or process.
-
-     Prune when you append: delete fixed gotchas, fold covered ones into their ADR/doc, rewrite
-     superseded bullets in place, and promote a bullet that keeps applying across features into
-     AGENTS.md, test-strategy.md, or an ADR. Keep under ~30 bullets; at the cap, remove one to add one. -->
-
-- **YYYY-MM-DD**: {the trap, and the rule that avoids it}
+- **2026-09-27**: Project bootstrapped from the SDLC kit scaffold; all Stage 0 artifacts filled from the operator's product brief.

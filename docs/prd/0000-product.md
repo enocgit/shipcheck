@@ -1,56 +1,50 @@
-# Product PRD — {product name}
+# Product PRD — Shipcheck
 
-> Follow the documentation writing standard in AGENTS.md. This is the project-level product
-> document, not a feature PRD. Record durable vision, boundaries, constraints, and links to
-> foundational ADRs. Revise it as the product changes, and delete unused sections once filled.
-> Keep it short: explain _why the product exists_, not how one feature works.
-
-- **Status:** Draft | Approved | Living
-- **Owner / date:** {name} / YYYY-MM-DD
+- **Status:** Draft
+- **Owner / date:** enoch / 2026-09-27
 
 ## Vision
 
-<!-- One paragraph: what this product is and the change it aims to make. -->
+Shipcheck answers one question per repository — **can I ship today?** — on a single glanceable
+page. Instead of hopping between the PR list, checks tabs, and branch views, the maintainer opens
+one page that names, per PR, the verdict and the reasons behind it.
 
 ## Target users
 
-- **{persona}** — who they are and the job they hire this product to do.
+- **Solo maintainer** — reviews and merges their own repo's PRs; wants a 10-second read of what is
+  safe to merge now and why.
 
 ## Problems we solve
 
-<!-- The core problems, in priority order. Tie back to docs/context.md. -->
-
-- {problem} — for {persona}.
-
-## Business model / how it sustains
-
-<!-- Only if relevant: how it creates and captures value. -->
+- Merge readiness is scattered across PR mergeability, check runs, review states, and branch age —
+  for the solo maintainer.
 
 ## Scope
 
-**In (the product is):** <!-- the bounded thing we are building -->
-**Out (the product is not):** <!-- explicit non-goals at the product level -->
+**In (the product is):** one server per repo (configured from env) that reads open PRs, latest CI
+runs, and branch freshness through the GitHub REST API with a read-only fine-grained token, caches
+responses in memory for 60 seconds, and renders one page with per-PR verdicts (`ship` / `fix` /
+`wait`, each with reasons), a branch-hygiene panel, and an overall ship signal.
+
+**Out (the product is not):** multi-repo, viewer authentication, webhooks, write operations,
+persistence.
 
 ## Success metrics (product-level)
 
-<!-- The 1–3 numbers that say the product is working. Not feature metrics. -->
-
-- {metric and target}
+- A maintainer can decide whether to merge each open PR within 10 seconds of opening the page.
+- Every verdict lists its reasons, so a surprising verdict is diagnosable from the page itself.
 
 ## Foundational decisions
 
-<!-- Pointers to the cross-cutting ADRs that establish the foundation. -->
-
-- Stack / framework → [ADR-NNNN](../adr/NNNN-{slug}.md)
-- Repo layout (mono/poly) → [ADR-NNNN](../adr/NNNN-{slug}.md)
-- Auth model → [ADR-NNNN](../adr/NNNN-{slug}.md)
-- Primary datastore → [ADR-NNNN](../adr/NNNN-{slug}.md)
-- API style (REST/tRPC/GraphQL) → [ADR-NNNN](../adr/NNNN-{slug}.md)
+- Stack / framework → [ADR-0002](../adr/0002-stack.md)
+- Repo layout → [ADR-0003](../adr/0003-repo-layout.md)
+- Auth model → [ADR-0004](../adr/0004-auth-and-token-model.md)
+- Primary datastore → [ADR-0005](../adr/0005-datastore.md)
+- API style → [ADR-0006](../adr/0006-api-style.md)
 
 ## Key constraints
 
-<!-- Hard product-level constraints (regulatory, regional, platform). See docs/context.md. -->
-
-## Roadmap shape (optional)
-
-<!-- The rough sequence of initial features, if useful. -->
+- Read-only: the token and the app never write to GitHub.
+- One repo per instance, from env config; no viewer authentication in v1, so the instance must not
+  be exposed beyond the operator.
+- No database, no background jobs; GitHub API + in-memory 60s cache only.

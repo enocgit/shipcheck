@@ -4,10 +4,8 @@
 > policy and links to real tools; do not duplicate the canonical Definition of Done from AGENTS.md.
 > Delete placeholder runners once the stack is set.
 >
-> **STATUS: TEMPLATE** — set the tools below from your **real** stack; the tool names are
-> placeholders, not a decision (e.g. the starter may be wired for Jest, not Vitest). The
-> authoritative completion policy lives in the project's operating manual. This doc adds only the
-> test-specific bar (see "Verification bar" below).
+> STATUS: configured 2026-09-27 — tools match the real stack (Vitest; pnpm + Node 20 CI in
+> `.github/workflows/ci.yml`).
 
 ## Policy
 
@@ -21,12 +19,12 @@ test.
 
 | Layer | Tool | What it covers | When required |
 | ------- | ------ | ---------------- | --------------- |
-| Unit | {unit runner — e.g. Vitest or Jest} | Pure logic, edge cases | All non-trivial logic |
-| Integration | {same runner} + test DB | Module ↔ DB, API handlers against the contract | Any data/contract change |
-| Contract | (contract-defined types, generated or directly shared) + schema validation | FE/BE agree on the frozen interface | Any contract change |
-| Failure path | {same runner} | Validation, authorization or security denial, error, retry, timeout, and partial-failure behavior | Whenever the executable branch can be exercised; defer only cases whose required deployed consumer, real data, deployment, traffic, load, compatibility, or multi-version condition is unavailable; see Lifecycle |
-| Load / perf | {tool} | Throughput, latency, saturation | When staging or production traffic exists |
-| E2E | {e2e tool — e.g. Playwright, Cypress, Maestro, or Detox} | Critical user flows end-to-end | Per epic's key flow |
+| Unit | Vitest | Pure logic, edge cases | All non-trivial logic |
+| Integration | Vitest + mocked GitHub HTTP (no test DB exists) | Module behavior, `/api/` handlers against the contract | Any data/contract change |
+| Contract | Zod schemas in `src/contracts/` shared directly | Server routes and page script agree on the frozen interface | Any contract change |
+| Failure path | Vitest | Validation, authorization or security denial, error, retry, timeout, and partial-failure behavior | Whenever the executable branch can be exercised; defer only cases whose required deployed consumer, real data, deployment, traffic, load, compatibility, or multi-version condition is unavailable; see Lifecycle |
+| Load / perf | N/A | Throughput, latency, saturation | When staging or production traffic exists |
+| E2E | Manual QA checklist (Playwright if a browser flow earns it) | Critical user flows end-to-end | Per epic's key flow |
 
 **Rule of thumb:** test logic at the lowest layer that gives confidence; reserve E2E for the few
 flows that matter most. Non-trivial executable behavior must be _covered_, not merely _touched_;

@@ -1,52 +1,64 @@
 # Architecture
 
 > Follow the documentation writing standard in AGENTS.md. This is the current system shape:
-> use compact summaries, diagrams or small tables when useful, and links to ADRs/contracts for
-> detail. Delete unused sections once filled. Decision _history_ lives in `docs/adr/`; update this
-> document when the shape changes and link the ADR that caused it.
+> compact summaries, linked to ADRs/contracts for detail. Decision _history_ lives in `docs/adr/`;
+> update this document when the shape changes and link the ADR that caused it.
 
 ## System context
 
-<!-- Who/what the system talks to. A C4 "context" view in prose or a diagram. -->
+A single Shipcheck server talks to two things: the **GitHub REST API** (read-only, fine-grained
+token, one repo — ADR-0004) and the **operator's browser**, which loads one HTML page and polls the
+JSON endpoints. No other systems, no database, no queues (ADR-0005).
 
 ## Containers / services
 
-<!-- The deployable pieces and how they communicate. -->
-
 | Container | Responsibility | Tech | Talks to |
 | --------- | -------------- | ---- | -------- |
-| Web | UI | React + TS | API |
-| API | Business logic | Node + TS | DB, external services |
-| DB | Persistence | Postgres | — |
+| Shipcheck server | Serves the page, reads GitHub, computes verdicts, caches 60s | Hono + TypeScript on Node 20 | GitHub REST API, browser |
+| Shipcheck page | Renders PR verdicts, branch-hygiene panel, ship signal | Static HTML + vanilla JS (or a Preact island) | Shipcheck server (`/api/`) |
 
 ## Key components
 
-<!-- Notable modules within containers and their boundaries. -->
+- **GitHub client** — the only code that calls GitHub; owns token handling and rate-limit awareness.
+- **Cache** — in-memory, single-process, 60s TTL per response (ADR-0005).
+- **Verdict engine** — pure logic mapping PR state (mergeability, checks, reviews, freshness) to
+  `ship` / `fix` / `wait` plus reasons; no I/O, fully unit-testable.
+- **Branch-hygiene module** — computes stale/ahead/behind state for branches.
+- **`/api/` routes** — Zod-validated read-only JSON endpoints; the contract (`src/contracts/`,
+  ADR-0006) is the seam to the page.
 
 ## Data model
 
-<!-- Core entities and relationships. Link to schema/migrations (the contract). -->
+No local persistence. Ephemeral shapes only: a snapshot of each open PR (head/base SHAs,
+mergeability, check runs, review state, timestamps) and derived verdicts, all matching the Zod
+schemas in `src/contracts/`. Source of truth is GitHub.
 
 ## Key flows
 
-<!-- 1–3 important sequences (e.g. payment, signup). Prose or sequence diagram. -->
-
-## Planned changes
-
-<!-- Approved future changes only. Link the decision and contract; keep current behavior in the
-     sections above. Never mark delivery progress here — the tracker owns live state, and a claim
-     is written only when it is true. When implementation lands, move the change's facts into the
-     current-state sections and drop the planned entry. Remove this section when no plans remain. -->
+1. **Page load** — browser requests the page, then `GET /api/status`. Server reads cache; on
+   miss/expiry it fetches open PRs, checks, and branch state from GitHub, computes verdicts,
+   caches, and returns the snapshot.
+2. **Verdict computation** — for each PR: mergeable + checks green + approved + fresh → `ship`;
+   failing checks or changes requested → `fix`; missing review, behind base, or stale → `wait`.
+   Reasons list alongside every verdict; the overall ship signal derives from all verdicts plus
+   branch hygiene.
 
 ## Cross-cutting concerns
 
-- **Auth:** {approach}
-- **Errors:** {approach}
-- **Observability:** {logs/metrics/traces — document a project-created runbook when operational needs require one}
-- **Config/secrets:** {approach}
+- **Auth:** outbound only — env-provided read-only fine-grained GitHub token; no viewer auth in v1
+  (ADR-0004).
+- **Errors:** GitHub API failures degrade per-section on the page (verdicts, hygiene, signal show
+  what succeeded) with a clear error state; token errors surface as config problems, never echoing
+  the token.
+- **Observability:** structured stdout logs (request line, GitHub call outcomes, cache hits);
+  no secrets or token material in logs.
+- **Config/secrets:** env only — `GITHUB_TOKEN` and the target repo; no config files.
 
 ## Decisions affecting this architecture
 
-<!-- Link the ADRs that shaped the above. -->
-
-- [ADR-0001](./adr/0001-record-architecture-decisions.md)
+- [ADR-0001](./adr/0001-record-architecture-decisions.md) — record architecture decisions
+- [ADR-0002](./adr/0002-stack.md) — TypeScript + Hono on Node 20
+- [ADR-0003](./adr/0003-repo-layout.md) — single-package layout
+- [ADR-0004](./adr/0004-auth-and-token-model.md) — read-only fine-grained token, no viewer auth
+- [ADR-0005](./adr/0005-datastore.md) — GitHub API as the only store, 60s in-memory cache
+- [ADR-0006](./adr/0006-api-style.md) — one HTML page plus Zod-defined JSON GET endpoints

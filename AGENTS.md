@@ -103,7 +103,7 @@ irreversible actions, and complex trade-offs; expand when asked.
 
 ## Conventions
 
-- **Stack (placeholder — set at Stage 0):** TypeScript + React and Node are illustrative defaults; replace with your real stack when you fill `docs/context.md`.
+- **Stack:** TypeScript, Hono on Node 20; frontend is one HTML page with vanilla JS or a Preact island; the GitHub REST API is the only store (in-memory 60s cache, no database).
 - **Branching — GitHub Flow:** `main` is always deployable. Work on short-lived `feat/{id}-{slug}` branches → PR → merge → deploy. Environments are deploy targets driven by CI, not long-lived branches. One feature per branch. A git worktree is an explicit manual escape hatch: the operator supplies a private, new or empty path outside every checkout and runs `feature-start`'s generic Git-only recipe, owning path selection, privacy, and containment checks.
 - **Where planning commits land.** Planning packages land on `main`, never a feature branch, and Stage 4 branches from a ref that already holds the frozen contract. The conductor's landing rules (`$SKILLS_DIR/sdlc/references/rules.md` → Default-branch landings) are canonical for the by-remote-state action; per-task learnings land before the next task; final-child reconciliation lands before the parent epic completes; an empty Retro needs no landing.
 - **Commits — Conventional Commits.** `type(scope): summary` — imperative, ≤72 chars. Types: `feat` `fix` `refactor` `test` `docs` `chore` `perf` `build` `ci`. Reference the relevant issue when one exists (`Refs #123`, or `Closes #123` on GitHub only,
