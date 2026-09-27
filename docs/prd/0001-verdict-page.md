@@ -5,7 +5,8 @@
 
 ## Summary
 
-- **Approval:** Draft
+- **Approval:** Approved
+- **Delivery:** Shipped 2026-09-27 via PR [#9](https://github.com/enocgit/shipcheck/pull/9) (merged as `5b1ed77`). All 8 acceptance criteria verified: 86 automated tests (`pnpm test --run`), lint/typecheck/build green, 11/11 browser QA checks. Residual: no run against the real GitHub API yet (no token configured) — recorded in `docs/security/records/2026-09-27-prd-0001-implementation.md`.
 - **Outcome:** The operator opens one page and sees, for every open PR in the configured repo, a
   verdict with reasons, a branch-hygiene panel, and an overall ship signal.
 - **Scope:** In — one composite `/api/status` snapshot endpoint, one-page UI with 60s auto-poll,

@@ -36,19 +36,18 @@ schemas in `src/contracts/`. Source of truth is GitHub.
 ## Key flows
 
 1. **Page load** — browser requests the page, then `GET /api/status`. Server reads cache; on
-   miss/expiry it fetches open PRs, checks, and branch state from GitHub, computes verdicts,
-   caches, and returns the snapshot.
-2. **Verdict computation** — for each PR: mergeable + checks green + approved + fresh → `ship`;
-   failing checks or changes requested → `fix`; missing review, behind base, or stale → `wait`.
-   Reasons list alongside every verdict; the overall ship signal derives from all verdicts plus
-   branch hygiene.
+   miss/expiry it fetches open PRs, checks (check runs + commit statuses), and branch state from
+   GitHub, computes verdicts, caches, and returns the snapshot. Collections are paginated to
+   completion; concurrent requests share one in-flight fetch round.
+2. **Verdict computation** — for each PR (against its own base branch): mergeable + checks green +
+   approved + fresh → `ship`; failing checks or changes requested → `fix`; missing review, draft,
+   behind base, stale, pending checks, or pending mergeability → `wait`. Reasons list alongside
+   every verdict; the overall ship signal derives from all verdicts plus branch hygiene and is
+   `unknown` when any section failed.
 
 ## Planned changes
 
-- **PRD-0001 (approved):** the v1 core — composite `/api/status` snapshot, one-page
-  UI with 60s auto-poll, verdict engine, branch-hygiene panel, ship signal, in-memory cache.
-  Contract frozen at `src/contracts/status.ts`; the sections above describe the shape this feature
-  builds. Live delivery state lives in the tracker.
+None.
 
 ## Cross-cutting concerns
 

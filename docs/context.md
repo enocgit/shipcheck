@@ -63,4 +63,6 @@ background jobs, no persistence.
 
 ## Learnings
 
-- **2026-09-27**: Project bootstrapped from the SDLC kit scaffold; all Stage 0 artifacts filled from the operator's product brief.
+- **2026-09-27**: Zod v4's `discriminatedUnion` rejects boolean literal discriminators (`ok: true/false`) — use `z.union` and keep the wire shape.
+- **2026-09-27**: pnpm 11 reads build-script approvals from `pnpm-workspace.yaml` (`allowBuilds:`), not `package.json#pnpm`; a fresh install fails with `ERR_PNPM_IGNORED_BUILDS` otherwise.
+- **2026-09-27**: in paginated-mock tests, `url.includes("page=1")` also matches `per_page=100` — infinite pagination and an OOM; match `/[?&]page=1&/` instead.
