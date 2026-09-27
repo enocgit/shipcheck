@@ -2,7 +2,7 @@
 # green" is a real gate and not just agent discipline. Adjust the stack/commands
 # to your project.
 #
-# Minutes: the push trigger re-runs CI on main after a PR merge, a near-duplicate
+# Minutes: the push trigger re-runs CI on main after a PR merge, near-duplicate
 # of the pull_request run (which tests the merge result). Keep it only if you
 # push directly to main — there it is your only CI. cancel-in-progress stops
 # superseded runs (force-pushes, fixup chains) from billing in parallel.
@@ -28,20 +28,25 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        # v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        # v6.1.0
+        uses: pnpm/action-setup@d9184bf108216479bc5a137cc391f4d7b14c870b
         # version is optional if package.json sets "packageManager";
         # otherwise pin it here:
         # with:
         #   version: 9
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        # v7.0.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
-          node-version: 20
-          cache: pnpm # or npm / yarn
+          # >= 22: pnpm 11 (pinned in package.json) needs Node 22+.
+          # The app floor is Node 22 (ADR-0002, amended).
+          node-version: 24
+          cache: pnpm
 
       - name: Install
         run: pnpm install --frozen-lockfile
