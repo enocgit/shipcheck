@@ -4,7 +4,7 @@
 > policy and links to real tools; do not duplicate the canonical Definition of Done from AGENTS.md.
 > Delete placeholder runners once the stack is set.
 >
-> STATUS: configured 2026-09-27 — tools match the real stack (Vitest; pnpm + Node 20 CI in
+> STATUS: configured 2026-09-27 — tools match the real stack (Vitest; pnpm + Node 22+ CI in
 > `.github/workflows/ci.yml`).
 
 ## Policy

@@ -14,7 +14,7 @@
   operations, persistence.
 - **Key decisions:** composite snapshot endpoint (ADR-0006); GitHub API as only store with 60s
   cache (ADR-0005); read-only fine-grained token, no viewer auth (ADR-0004); Hono + TypeScript on
-  Node 20 (ADR-0002).
+  Node 22+ (ADR-0002, amended from Node 20 during implementation).
 - **Constraints:** read-only token only; instance must not be exposed beyond the operator
   (ADR-0004); no database or background jobs (ADR-0005).
 - **Links:** [Product PRD](0000-product.md) · [ADR-0002](../adr/0002-stack.md) ·

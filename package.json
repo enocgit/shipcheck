@@ -1,0 +1,31 @@
+{
+  "name": "shipcheck",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.3.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.14.4",
+    "hono": "^4.9.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^20.19.0",
+    "eslint": "^9.30.0",
+    "globals": "^17.12.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.0",
+    "typescript-eslint": "^8.35.0",
+    "vitest": "^3.2.0"
+  }
+}
